@@ -1,0 +1,63 @@
+# Docker specific aliases
+# https://blog.ropnop.com/docker-for-pentesters/
+
+# Drop into shell for given hub image
+# 'dockershell debian:stable'
+# 'dockershell tomcat:6' --- need to evaluate what files might exist on tomcat?
+# 'dockershell node:lts'
+alias dockershell="docker run --rm -i -t --entrypoint=/bin/bash"
+
+# Drop into shell for given hub image, mounting current dir as volume
+function dockershellhere() {
+    dirname=${PWD##*/}
+    docker run --rm -it --entrypoint=/bin/bash -v `pwd`:/${dirname} -w /${dirname} "$@"
+}
+
+# Drop into kali shell
+# Image must be prebuilt by navigation to dir with kali Dockerfile and..
+# running 'docker build --tag "kali-headless" .'
+alias kalishell="docker run --rm -i -t 'kali-headless'"
+# Same kali shell, only mounty the current directory
+function kalishellhere() {
+    dirname=${PWD##*/}
+    docker run --rm -it --entrypoint=/bin/bash -v `pwd`:/${dirname} -w /${dirname} "kali-headless"
+}
+
+# Run impacket tools directly using an impacket container using 'impacket <cmd>' directly from command line
+alias impacket="docker run --rm -it rflathers/impacket" 
+
+# Create an SMB server serving files from current directory
+# (Uses impacket container)
+function smbservehere() {
+    local sharename
+    [[ -z $1 ]] && sharename="SHARE" || sharename=$1
+    docker run --rm -it -p 445:445 -v "${PWD}:/tmp/serve" rflathers/impacket smbserver.py -smb2support $sharename /tmp/serve
+}
+
+# Serve files in current directory over nginx
+alias nginxhere='docker run --rm -it -p 80:80 -p 443:443 -v "${PWD}:/srv/data" rflathers/nginxserve'
+
+# Serve files in current dir from a WebDAV container
+alias webdavhere='docker run --rm -it -p 80:80 -v "${PWD}:/srv/data/share" rflathers/webdav'
+
+# To have persistence, create a local ~/.msf4 directory to be mounted as volume
+alias metasploit='docker run --rm -it -v "${HOME}/.msf4:/home/msf/.msf4" metasploitframework/metasploit-framework ./msfconsole'
+
+# Same as above, but expose ports for serving files or catching shells
+alias metasploitports='docker run --rm -it -v "${HOME}/.msf4:/home/msf/.msf4" -p 8443-8500:8443-8500 metasploitframework/metasploit-framework ./msfconsole'
+
+# Generate payload with msfvenom
+alias msfvenomhere='docker run --rm -it -v "${HOME}/.msf4:/home/msf/.msf4" -v "${PWD}:/data" metasploitframework/metasploit-framework ./msfvenom'
+
+# Start a server that will echo out any HTTP requests it receives
+alias reqdump='docker run --rm -it -p 80:3000 rflathers/reqdump'
+
+# Start a server that will write all post requests it receives to a file in mounted volume
+alias postfiledumphere='docker run --rm -it -p80:3000 -v "${PWD}:/data" rflathers/postfiledump'
+
+
+
+
+
+
+
