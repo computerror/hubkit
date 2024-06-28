@@ -12,5 +12,5 @@ More detailed setup and use cases can be found as comments in the aliases file.
 
 
 ---
-This project largely started its life inspired by ropnop's [work](https://blog.ropnop.com/docker-for-pentesters/).
-Thanks for the inspiration!
+This project largely started its life inspired by ropnop's [work](https://blog.ropnop.com/docker-for-pentesters/). Thanks!
+
